@@ -1,3 +1,9 @@
+#default chains
+
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD DROP
+
 #logs
 
 iptables -N ACCEPT_LOG
@@ -10,9 +16,15 @@ iptables -A DROP_LOG -j DROP
 
 #web
 
-iptables -A INPUT -p tcp -m state --state NEW,ESTABLISHED -m multiport --dports 80,443 -j ACCEPT_LOG
+iptables -A INPUT -p tcp -m state --state NEW,ESTABLISHED -m multiport --dports 22,80,443 -j ACCEPT_LOG
 
-iptables -A OUTPUT -p tcp -m state --state ESTABLISHED -m multiport --sports 80,443 -j ACCEPT_LOG
+iptables -A OUTPUT -p tcp -m state --state ESTABLISHED -m multiport --sports 22,80,443 -j ACCEPT_LOG
+
+#ntp
+
+iptables -A INPUT -p udp -m state --state NEW,ESTABLISHED -m multiport --dport 123 -j ACCEPT_LOG
+
+iptables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -m multiport --sport 123 -j ACCEPT_LOG
 
 #east_west
 
@@ -27,4 +39,5 @@ iptables -A INPUT -i lo -j ACCEPT
 #default log --> drop
 
 iptables -A INPUT -j DROP_LOG
+
 iptables -A OUTPUT -j DROP_LOG
